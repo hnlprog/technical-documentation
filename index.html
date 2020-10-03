@@ -1,0 +1,185 @@
+<html>
+  <head>
+    <link href="style.css" rel="stylesheet">
+  </head>
+  <body>
+    <input id="nav-trigger" type="checkbox">
+    <nav id="navbar">
+      <header>
+        <h1>
+          Writing Documentation
+        </h1>
+      </header>
+      <ol id="toc">
+        <li class="nav-item">
+          <h2>
+            <a class="nav-link" href="#Markdown">Markdown</a>
+          </h2>
+        </li>
+        <li class="nav-item">
+          <h2>
+            <a class="nav-link" href="#Module_Attributes">Module Attributes</a>
+          </h2>
+        </li>
+        <li class="nav-item">
+          <h2>
+            <a class="nav-link" href="#Function_Arguments">Function Arguments</a>
+          </h2>
+        </li>
+        <li class="nav-item">
+          <h2>
+            <a class="nav-link" href="#Documentation_metadata">Documentation metadata</a>
+          </h2>
+        </li>
+        <li class="nav-item">
+          <h2>
+            <a class="nav-link" href="#Recommendations">Recommendations</a>
+          </h2>
+        </li>
+      </ol>
+    </nav>
+    <label class="btn" for="nav-trigger" id="trigger-label"><svg height="20" viewBox="0 0 100 80" width="20"><rect height="20" width="100"></rect><rect height="20" width="100" y="30"></rect><rect height="20" width="100" y="60"></rect></svg></label><main id="main-doc">
+      <p>
+        Elixir treats documentation as a first-class citizen. This means documentation should be easy to write and easy to read. In this document you will learn how to write documentation in Elixir, covering constructs like module attributes, style practices and doctests.
+      </p>
+      <section class="main-section" id="Markdown">
+        <header>
+          <h2>
+            Markdown
+          </h2>
+        </header>
+        <p>
+          Elixir documentation is written using Markdown. There are plenty of guides on Markdown online, we recommend the ones available at GitHub as a getting started point:
+        </p>
+        <ul>
+          <li>
+            <a href="https://help.github.com/articles/basic-writing-and-formatting-syntax/">Basic writing and formatting syntax</a>
+          </li>
+          <li>
+            <a href="https://guides.github.com/features/mastering-markdown/">Mastering Markdown</a>
+          </li>
+        </ul>
+      </section>
+      <section class="main-section" id="Module_Attributes">
+        <header>
+          <h2>
+            Module Attributes
+          </h2>
+        </header>
+        <p>
+          Documentation in Elixir is usually attached to module attributes. Let's see an example:
+        </p>
+        <pre><code class="code-box">defmodule MyApp.Hello do
+  @moduledoc """
+  This is the Hello module.
+  """
+  @moduledoc since: "1.0.0"
+
+  @doc """
+  Says hello to the given `name`.
+
+  Returns `:ok`.
+
+  ## Examples
+
+      iex> MyApp.Hello.world(:john)
+      :ok
+
+  """
+  @doc since: "1.3.0"
+  def world(name) do
+    IO.puts("hello #{name}")
+  end</code></pre>
+        <p>The <code>@moduledoc</code> attribute is used to add documentation to the module. <code>@doc</code> is used before a function to provide documentation for it. Besides the attributes above, <code>@typedoc</code> can also be used to attach documentation to types defined as part of typespecs. Elixir also allows metadata to be attached to documentation, by passing a keyword list to <code>@doc</code> and friends.
+        </p>
+      </section>
+      <section class="main-section" id="Function_Arguments">
+        <header>
+          <h2>
+            Function Arguments
+          </h2>
+        </header>
+        <p>
+          When documenting a function, argument names are inferred by the compiler. For example:
+        </p>
+        <pre><code class="code-box">def size(%{size: size}) do
+  size
+end</code></pre>
+        <p>The compiler will infer this argument as <code>map</code>. Sometimes the inference will be suboptimal, especially if the function contains multiple clauses with the argument matching on different values each time. You can specify the proper names for documentation by declaring only the function head at any moment before the implementation:
+        </p>
+        <pre><code class="code-box">def size(map_with_size)
+def size(%{size: size}) do
+  size
+end</code></pre>
+      </section>
+      <section class="main-section" id="Documentation_metadata">
+        <header>
+          <h2>
+            Documentation metadata
+          </h2>
+        </header>
+        <p>Elixir allows developers to attach arbitrary metadata to the documentation. This is done by passing a keyword list to the relevant attribute (such as <code>@moduledoc</code>, <code>@typedoc</code>, and <code>@doc</code>). A commonly used metadata is <code>:since</code>, which annotates in which version that particular module, function, type, or callback was added, as shown in the example above.
+        </p>
+        <p>
+          Another common metadata is :deprecated, which emits a warning in the documentation, explaining that its usage is discouraged: 
+        </p>
+        <pre><code class="code-box">@doc deprecated: "Use Foo.bar/2 instead"</code></pre>
+        <p>Note the <code>:deprecated</code> key does not warn when a developer invokes the functions. If you want the code to also emit a warning, you can use the <code>@deprecated</code> attribute:
+        </p>
+        <pre><code class="code-box">@deprecated "Use Foo.bar/2 instead"</code></pre>
+        <p>
+          Metadata can have any key. Documentation tools often use metadata to provide more data to readers and to enrich the user experience.
+        </p>
+      </section>
+      <section class="main-section" id="Recommendations">
+        <header>
+          <h2>
+            Recommendations
+          </h2>
+        </header>
+        <p>
+          When writing documentation:
+        </p>
+        <ul>
+          <li>
+            <p>
+              Keep the first paragraph of the documentation concise and simple, typically one-line. Tools like <a href="https://github.com/elixir-lang/ex_doc/">ExDoc</a> use the first line to generate a summary.
+            </p>
+          </li>
+          <li>
+            <p>
+              Reference modules by their full name.
+            </p>
+            <p>Markdown uses backticks (<code>`</code>) to quote code. Elixir builds on top of that to automatically generate links when module or function names are referenced. For this reason, always use full module names. If you have a module called <code>MyApp.Hello</code>, always reference it as <code>`MyApp.Hello`</code> and never as <code>`Hello`</code>.
+            </p>
+          </li>
+          <li>
+            <p>Reference functions by name and arity if they are local, as in <code>`world/1`</code>, or by module, name and arity if pointing to an external module: <code>`MyApp.Hello.world/1`</code>.
+            </p>
+          </li>
+          <li>
+            <p>Reference a <code>@callback</code> by prepending <code>c:</code>, as in <code>`c:world/1`</code>.
+            </p>
+          </li>
+          <li>
+            <p>Reference a <code>@type</code> by prepending <code>t:</code>, as in <code>`t:values/0`</code>.
+            </p>
+          </li>
+          <li>
+            <p>Start new sections with second level Markdown headers <code>##</code>. First level headers are reserved for module and function names.
+            </p>
+          </li>
+          <li>
+            <p>
+              Place documentation before the first clause of multi-clause functions. Documentation is always per function and arity and not per clause.
+            </p>
+          </li>
+          <li>
+            <p>Use the <code>:since</code> key in the documentation metadata to annotate whenever new functions or modules are added to your API.
+            </p>
+          </li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>
